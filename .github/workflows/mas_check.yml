@@ -19,42 +19,43 @@ jobs:
     name: ci_build
 
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     env:
       SDL_AUDIODRIVER: dummy # handles ALSA issues
+      RENPY_VERSION: "8.3.7"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v5
         with:
           # Version range or exact version of a Python version to use, using SemVer's version range syntax.
-          python-version: 2.7.18 # optional, default is 3.x
+          python-version: '3.10'
 
       # get/dl renpy src
       - name: cache rpy source
         id: cache-rpy
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
             path: renpy/
-            key: ${{ runner.os }}-rpy
+            key: ${{ runner.os }}-rpy-${{ env.RENPY_VERSION }}
 
       - name: Download rpy source
         if: steps.cache-rpy.outputs.cache-hit != 'true'
         run: |
-          wget https://www.renpy.org/dl/6.99.12.4/renpy-6.99.12.4-sdk.tar.bz2
-          tar xf renpy-6.99.12.4-sdk.tar.bz2
-          rm renpy-6.99.12.4-sdk.tar.bz2
-          mv renpy-6.99.12.4-sdk renpy
+          wget https://www.renpy.org/dl/${{ env.RENPY_VERSION }}/renpy-${{ env.RENPY_VERSION }}-sdk.tar.bz2
+          tar xf renpy-${{ env.RENPY_VERSION }}-sdk.tar.bz2
+          rm renpy-${{ env.RENPY_VERSION }}-sdk.tar.bz2
+          mv renpy-${{ env.RENPY_VERSION }}-sdk renpy
 
       # get/download base mas
       - name: cache base MAS
         id: cache-mas
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
             path: mas0105/
             key: ${{ runner.os }}-mas
